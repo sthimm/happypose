@@ -73,7 +73,7 @@ def convert_results_to_coco(results_path, out_json_path, detection_method):
     # Third Party
     from bop_toolkit_lib.pycoco_utils import binary_mask_to_polygon
 
-    results = torch.load(results_path)
+    results = torch.load(results_path, weights_only=False)
     predictions = results["predictions"][detection_method]
     print("Detections from:", results_path)
     print("Detection method:", detection_method)
@@ -104,7 +104,7 @@ def convert_results_to_coco(results_path, out_json_path, detection_method):
 def convert_results_to_bop(
     results_path: Path, out_csv_path: Path, method: str, use_pose_score: bool = True
 ):
-    predictions = torch.load(results_path)["predictions"]
+    predictions = torch.load(results_path, weights_only=False)["predictions"]
     predictions = predictions[method]
     if method == "coarse":
         predictions = get_best_coarse_predictions(predictions)

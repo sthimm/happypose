@@ -21,6 +21,7 @@ from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR, RESULTS_
 from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
     make_object_dataset,
     make_scene_dataset,
+    make_urdf_dataset,
 )
 from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import (
     MultiViewWrapper,
@@ -79,7 +80,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def load_detector(run_id):
     run_dir = EXP_DIR / run_id
-    cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.FullLoader)
+    cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
     cfg = check_update_config_detector(cfg)
     label_to_category_id = cfg.label_to_category_id
     model = create_model_detector(cfg, len(label_to_category_id))
@@ -95,12 +96,12 @@ def load_detector(run_id):
 
 def load_pose_models(coarse_run_id, refiner_run_id=None, n_workers=8):
     run_dir = EXP_DIR / coarse_run_id
-    cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.FullLoader)
+    cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
     cfg = check_update_config_pose(cfg)
 
     object_ds = make_object_dataset(cfg.object_ds_name)
     mesh_db = MeshDataBase.from_object_ds(object_ds)
-    renderer = BulletBatchRenderer(object_set=cfg.urdf_ds_name, n_workers=n_workers)
+    renderer = BulletBatchRenderer(asset_dataset=make_urdf_dataset(cfg.urdf_ds_name), n_workers=n_workers)
     mesh_db_batched = mesh_db.batched().cuda()
 
     coarse_model = load_model_cosypose(
@@ -275,7 +276,8 @@ def main():
     if args.n_views > 1:
         ds_names = ["hb", "tless", "ycbv"]
     else:
-        ds_names = ["hb", "icbin", "itodd", "lmo", "tless", "tudl", "ycbv"]
+        # ds_names = ["hb", "icbin", "itodd", "lmo", "tless", "tudl", "ycbv"]
+        ds_names = ["icbin", "tudl", "ycbv", "hb", "itodd", "lmo", "tless"]
 
     for ds_name in ds_names:
         this_cfg = deepcopy(cfg)

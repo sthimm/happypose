@@ -79,6 +79,8 @@ def ply_to_obj(ply_path: Path, obj_path: Path, texture_size=None):
 
     # adapt materials according to previous example meshes
     if mesh.visual.defined:
+        if not hasattr(mesh.visual, "material"):
+            mesh.visual = mesh.visual.to_texture()
         mesh.visual.material.ambient = np.array([51, 51, 51, 255], dtype=np.uint8)
         mesh.visual.material.diffuse = np.array([255, 255, 255, 255], dtype=np.uint8)
         mesh.visual.material.specular = np.array([255, 255, 255, 255], dtype=np.uint8)

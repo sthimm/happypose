@@ -11,6 +11,7 @@ import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
 from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import (
     DistributedSceneSampler,
 )
+from happypose.toolbox.inference.types import ObservationTensor
 from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     get_rank,
     get_tmp_dir,
@@ -110,7 +111,7 @@ class BopPredictionRunner:
                 torch.cuda.synchronize()
                 start = time.time()
                 this_batch_detections = detector.get_detections(
-                    images=images,
+                    observation=ObservationTensor(images=images),
                     one_instance_per_class=False,
                     detection_th=detection_th,
                     output_masks=use_icp,
@@ -123,7 +124,7 @@ class BopPredictionRunner:
 
                 all_preds = {}
                 if len(this_batch_detections) > 0:
-                    final_preds, all_preds = pose_predictor.get_predictions(
+                    final_preds, all_preds = pose_predictor.run_inference_pipeline(
                         images,
                         cameras.K,
                         detections=this_batch_detections,

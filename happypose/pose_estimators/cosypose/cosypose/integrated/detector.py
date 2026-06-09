@@ -12,7 +12,7 @@ from happypose.toolbox.inference.utils import add_instance_id, filter_detections
 
 
 class Detector(DetectorModule):
-    def __init__(self, model, ds_name):
+    def __init__(self, model, ds_name=None):
         super().__init__()
         self.model = model
         self.model.eval()
@@ -20,12 +20,13 @@ class Detector(DetectorModule):
         self.category_id_to_label = {
             v: k for k, v in self.config.label_to_category_id.items()
         }
-        if ds_name == "ycbv.bop19":
-            ds_name = "ycbv"
-        for k, v in self.category_id_to_label.items():
-            if k == 0:
-                continue
-            self.category_id_to_label[k] = f"{ds_name}-" + v
+        if ds_name is not None:
+            if ds_name == "ycbv.bop19":
+                ds_name = "ycbv"
+            for k, v in self.category_id_to_label.items():
+                if k == 0:
+                    continue
+                self.category_id_to_label[k] = f"{ds_name}-" + v
 
     @torch.no_grad()
     def get_detections(
