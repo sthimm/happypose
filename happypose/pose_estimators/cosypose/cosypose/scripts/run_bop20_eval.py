@@ -44,7 +44,7 @@ def run_evaluation(args):
 
 
 def convert_results(results_path, out_csv_path, method):
-    predictions = torch.load(results_path)["predictions"]
+    predictions = torch.load(results_path, weights_only=False)["predictions"]
     predictions = predictions[method]
     print("Predictions from:", results_path)
     print("Method:", method)

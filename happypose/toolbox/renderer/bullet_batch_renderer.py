@@ -54,20 +54,15 @@ def worker_loop(
                 render_depth=render_depth,
                 render_binary_mask=render_binary_mask,
             )
-            rgbs = np.stack([ren.rgb for ren in renderings])
-            depth = (
-                np.stack([ren.depth for ren in renderings]) if render_depth else None
-            )
-            binary_mask = (
-                np.stack([ren.binary_mask for ren in renderings])
-                if render_binary_mask
-                else None
-            )
+            rendering = renderings[0]
+            rgbs = rendering.rgb
+            depth = rendering.depth if render_depth else None
+            binary_mask = rendering.binary_mask if render_binary_mask else None
         else:
             w, h = cam_infos[0]["resolution"]
-            rgbs = np.zeros((1, h, w, 3), dtype=np.uint8)
-            depth = np.zeros((1, h, w), dtype=np.float32)
-            binary_mask = np.zeros((1, h, w), dtype=bool)
+            rgbs = np.zeros((h, w, 3), dtype=np.uint8)
+            depth = np.zeros((h, w), dtype=np.float32)
+            binary_mask = np.zeros((h, w), dtype=bool)
 
         output = WorkerRenderOutput(
             data_id=render_args["data_id"],

@@ -162,7 +162,7 @@ class PandasTensorCollection(TensorCollection):
         if rank == 0 and world_size > 1:
             for n in range(1, world_size):
                 tmp_file = tmp_file_template.format(rank=n)
-                data = torch.load(tmp_file)
+                data = torch.load(tmp_file, weights_only=False)
                 datas.append(data)
                 Path(tmp_file).unlink()
 
